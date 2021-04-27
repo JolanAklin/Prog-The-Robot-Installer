@@ -1,0 +1,24 @@
+﻿<Window x:Class="ProgTheRobotSetup.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProgTheRobotSetup"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="495" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+		</Grid.ColumnDefinitions>
+		<Grid x:Name="MainGrid" Grid.RowSpan="2" Grid.ColumnSpan="2">
+			<Button Content="Installer Prog The Robot" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="StartInstall"/>
+		</Grid>
+		<Grid x:Name="DownloadGrid" Panel.ZIndex="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+			<ProgressBar x:Name="DownLoadProgress" HorizontalAlignment="Center" Height="10" VerticalAlignment="Center" Width="200"/>
+		</Grid>
+	</Grid>
+
+</Window>
