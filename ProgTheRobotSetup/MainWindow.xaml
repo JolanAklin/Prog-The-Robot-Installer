@@ -5,20 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProgTheRobotSetup"
         mc:Ignorable="d"
-        Title="MainWindow" Height="495" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded">
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition/>
-		</Grid.ColumnDefinitions>
-		<Grid x:Name="MainGrid" Grid.RowSpan="2" Grid.ColumnSpan="2">
-			<Button Content="Installer Prog The Robot" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="StartInstall"/>
-		</Grid>
-		<Grid x:Name="DownloadGrid" Panel.ZIndex="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-			<ProgressBar x:Name="DownLoadProgress" HorizontalAlignment="Center" Height="10" VerticalAlignment="Center" Width="200"/>
-		</Grid>
-	</Grid>
+        Title="MainWindow" Height="495" Width="600" ResizeMode="NoResize" Loaded="Window_Loaded" Background="#FF101010" Foreground="#FF646464">
+    <Grid ScrollViewer.VerticalScrollBarVisibility="Visible">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="MainGrid" Grid.RowSpan="2" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <Button Style="{DynamicResource ProgTheRobotButtonTemplate}" x:Name="button" Content="Installer Prog The Robot" HorizontalAlignment="Stretch" Margin="5,5,5,5" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" Click="StartInstall"/>
+            <Button x:Name="UninstallButton" Style="{DynamicResource WarningButton}" Content="Désinstaller Prog The Robot" Margin="5,5,5,5" Grid.Row="1" Click="Uninstall"/>
+            <Image x:Name="image" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/imgrobot_squared.png" Margin="10,10,10,10"/>
+        </Grid>
+        <Grid x:Name="DownloadGrid" Panel.ZIndex="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Visible" d:IsHidden="True" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Image x:Name="image_Copy" Source="/imgrobot_side.png" HorizontalAlignment="Right" Stretch="UniformToFill"/>
+            <ProgressBar x:Name="DownLoadProgress" HorizontalAlignment="Center" Height="15" VerticalAlignment="Center" Width="200" BorderThickness="0,0,0,0" Foreground="#FF00639C" Background="#FF1E1E1E" Grid.Column="1"/>
+        </Grid>
+    </Grid>
 
 </Window>

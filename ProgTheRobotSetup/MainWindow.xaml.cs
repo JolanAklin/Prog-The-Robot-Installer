@@ -2,21 +2,12 @@
 using ICSharpCode.SharpZipLib.Zip;
 using IWshRuntimeLibrary;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Octokit;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ProgTheRobotSetup
 {
@@ -25,6 +16,9 @@ namespace ProgTheRobotSetup
     /// </summary>
     public partial class MainWindow : Window
     {
+        string installPath = $@"C:\Program Files\ProgTheRobot";
+        string path = $@"C:\Program Files\ProgTheRobot\temp\";
+        string dlFileName = "progtherobot";
         public MainWindow()
         {
             InitializeComponent();
@@ -34,29 +28,40 @@ namespace ProgTheRobotSetup
         {
             DownloadGrid.Visibility = Visibility.Hidden;
         }
+        private void Uninstall(object sender, RoutedEventArgs e)
+        {
+            if(MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                RemoveInstallDir(new string[] { installPath, path });
+                RemoveStartMenuEntry();
+                // need to remove files in locallow and the file association
+                MessageBox.Show("The programm has been uninstalled properly");
+            }
+        }
 
         private void StartInstall(object sender, RoutedEventArgs e)
         {
             MainGrid.Visibility = Visibility.Hidden;
             DownloadGrid.Visibility = Visibility.Visible;
 
-            string installPath = $@"C:\Program Files\ProgTheRobot";
-            string path = $@"C:\Program Files\ProgTheRobot\temp\";
-            string dlFileName = "progtherobot";
-            if (Directory.Exists(installPath))
-                Directory.Delete(installPath);
-            Directory.CreateDirectory(installPath);
-            if (Directory.Exists(path))
-                Directory.Delete(path);
-            Directory.CreateDirectory(path);
-            DownloadFromUrl(
-                new Uri("https://github.com/JolanAklin/ProgTheRobot/releases/download/v1.0a/Prog_the_robot_v1-0a.zip"),
-                System.IO.Path.Combine(path, dlFileName), 
-                () => {
+
+
+            RemoveInstallDir(new string[] { installPath, path });
+            CreateInstallDir(new string[] { installPath, path });
+
+            GetDownloadLinks((url) =>
+            { 
+                DownloadFromUrl(
+                new Uri(url),
+                System.IO.Path.Combine(path, dlFileName),
+                () =>
+                {
                     FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(path, dlFileName));
                     UnzipFromStream(stream, installPath);
-                    CreateStartMenuEntry(System.IO.Path.Combine(installPath, "prog_the_robot/Prog the robot.exe"));
+                    CreateStartMenuEntry(System.IO.Path.Combine(installPath, "Prog the robot.exe"));
+                    MessageBox.Show("Finished");
                 });
+            });
         }
 
 
@@ -72,6 +77,24 @@ namespace ProgTheRobotSetup
             DownLoadProgress.Value = e.ProgressPercentage;
         }
 
+        private void CreateInstallDir(string[] dirs)
+        {
+            foreach (string path in dirs)
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+            }
+        }
+
+        private void RemoveInstallDir(string[] dirs)
+        {
+            foreach (string path in dirs)
+            {
+                if (Directory.Exists(path))
+                    Directory.Delete(path, true);
+            }
+        }
+
 
         /// <summary>
         /// Create a start menu entry<see cref="https://morgantechspace.com/2015/01/create-start-menu-shortcut-all-programs-csharp.html"/>
@@ -80,13 +103,20 @@ namespace ProgTheRobotSetup
         private void CreateStartMenuEntry(string targetPath)
         {
             string programs_path = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
-            string settingsLink = System.IO.Path.Combine(programs_path, "ProgTheRobot.lnk");
+            string settingsLink = System.IO.Path.Combine(programs_path, "Prog The Robot.lnk");
             IWshShortcut shortcut = (IWshShortcut)new WshShell().CreateShortcut(settingsLink);
             shortcut.TargetPath = targetPath;
-            //shortcut.IconLocation = @"C:\Program FilesMorganTechSpacesettings.ico";
-            //shortcut.Arguments = "arg1 arg2";
             shortcut.Description = "Launch Prog The Robot";
             shortcut.Save();
+        }
+
+        /// <summary>
+        /// Remove the start menu entry
+        /// </summary>
+        private void RemoveStartMenuEntry()
+        {
+            string programs_path = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
+            System.IO.File.Delete(System.IO.Path.Combine(programs_path, "Prog The Robot.lnk"));
         }
 
         /// <summary>
@@ -130,5 +160,19 @@ namespace ProgTheRobotSetup
                 }
             }
         }
+
+
+        /// <summary>
+        /// <see cref="https://stackoverflow.com/questions/25678690/how-can-i-check-github-releases-in-c"/>
+        /// </summary>
+        private async void GetDownloadLinks(Action<string> endCallBack)
+        {
+            GitHubClient client = new GitHubClient(new ProductHeaderValue("ProgTheRobotSetup"));
+            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("jolanaklin", "progtherobot");
+            var latest = releases[0];
+            string url = Array.Find<ReleaseAsset>(latest.Assets.ToArray(), x => x.Name == "ProgTheRobot.zip").BrowserDownloadUrl;
+            endCallBack?.Invoke(url);
+        }
+
     }
 }
