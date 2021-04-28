@@ -39,7 +39,7 @@ namespace ProgTheRobotSetup
         const string UNINSTALLBAT_PATH = @"C:\Program Files\uninstall46746234645.bat";
         const string TEMP_PATH = @"C:\Program Files\ProgTheRobot\temp\";
         const string DL_FILE_NAME = "progtherobot";
-        const string PROGRAMS_PATH = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
+        const string PROGRAMS_PATH = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\ProgTheRobot";
 
         enum GridPanel
         {
@@ -110,6 +110,12 @@ namespace ProgTheRobotSetup
         {
             if(MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
+
+                if(IsFileLocked(new FileInfo(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"))))
+                {
+                    MessageBox.Show("Please close Prog The Robot First", "Uninstall", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 RemoveStartMenuEntry();
 
                 var procId = Process.GetCurrentProcess().Id;
@@ -128,12 +134,47 @@ namespace ProgTheRobotSetup
             }
         }
 
+        /// <summary>
+        /// <see cref="https://www.codercream.com/check-file-use-c-code/"/>
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        protected virtual bool IsFileLocked(FileInfo file)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(System.IO.FileMode.Open, FileAccess.Write, FileShare.None);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return false;
+        }
+
+
         private void StartInstall(object sender, RoutedEventArgs e)
         {
             ShowNextGrid();
 
-            RemoveDir(new string[] { INSTALL_PATH, TEMP_PATH });
-            CreateDir(new string[] { INSTALL_PATH, TEMP_PATH });
+            CreateDir(new string[] { INSTALL_PATH, TEMP_PATH, PROGRAMS_PATH });
+
+            string path = Process.GetCurrentProcess().MainModule.FileName;
+            string fileName = System.IO.Path.GetFileName(path);
+            System.IO.File.Copy(path, System.IO.Path.Combine(INSTALL_PATH, fileName), true);
 
             GetDownloadLinks((url) =>
             { 
@@ -144,8 +185,11 @@ namespace ProgTheRobotSetup
                 {
                     FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME));
                     UnzipFromStream(stream, INSTALL_PATH);
-                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"));
+                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), "Prog The Robot.lnk", "Launch Prog The Robot");
+                    RemoveDir(new string[] { TEMP_PATH });
+                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
                     MessageBox.Show("Finished");
+                    System.Windows.Application.Current.Shutdown();
                 });
             });
         }
@@ -186,12 +230,12 @@ namespace ProgTheRobotSetup
         /// Create a start menu entry<see cref="https://morgantechspace.com/2015/01/create-start-menu-shortcut-all-programs-csharp.html"/>
         /// </summary>
         /// <param name="targetPath">The path to the executable</param>
-        private void CreateStartMenuEntry(string targetPath)
+        private void CreateStartMenuEntry(string targetPath, string linkName, string description)
         {
-            string appLink = System.IO.Path.Combine(PROGRAMS_PATH, "Prog The Robot.lnk");
+            string appLink = System.IO.Path.Combine(PROGRAMS_PATH, linkName);
             IWshShortcut shortcut = (IWshShortcut)new WshShell().CreateShortcut(appLink);
             shortcut.TargetPath = targetPath;
-            shortcut.Description = "Launch Prog The Robot";
+            shortcut.Description = description;
             shortcut.Save();
         }
 
@@ -200,8 +244,7 @@ namespace ProgTheRobotSetup
         /// </summary>
         private void RemoveStartMenuEntry()
         {
-            string programs_path = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
-            System.IO.File.Delete(System.IO.Path.Combine(programs_path, "Prog The Robot.lnk"));
+            Directory.Delete(PROGRAMS_PATH, true);
         }
 
         /// <summary>
