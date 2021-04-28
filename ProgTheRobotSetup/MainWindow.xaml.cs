@@ -20,6 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Reflection;
 using System.Threading;
+using System.Diagnostics;
 
 namespace ProgTheRobotSetup
 {
@@ -35,6 +36,7 @@ namespace ProgTheRobotSetup
 
         // install constants
         const string INSTALL_PATH = @"C:\Program Files\ProgTheRobot";
+        const string UNINSTALLBAT_PATH = @"C:\Program Files\uninstall46746234645.bat";
         const string TEMP_PATH = @"C:\Program Files\ProgTheRobot\temp\";
         const string DL_FILE_NAME = "progtherobot";
         const string PROGRAMS_PATH = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
@@ -109,10 +111,19 @@ namespace ProgTheRobotSetup
             if(MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 RemoveStartMenuEntry();
-                // do not put the default file in the locallow
-                // need to remove files in locallow and the file association
-                Thread uninstallThread = new Thread(Uninstall);
-                uninstallThread.Start();
+
+                var procId = Process.GetCurrentProcess().Id;
+
+                StreamWriter stream = System.IO.File.CreateText(UNINSTALLBAT_PATH);
+                stream.WriteLine($"Taskkill /F /PID {procId}");
+                stream.WriteLine($"rmdir /S /Q \"{INSTALL_PATH}\"");
+                stream.WriteLine("powershell -Command \"& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Prog The Robot was successfully removed', 'Uninstaller', 'OK', [System.Windows.Forms.MessageBoxIcon]::Information);}\"");
+                stream.WriteLine($"del /Q \"{UNINSTALLBAT_PATH}\"");
+                stream.Close();
+                Process process = new Process();
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.FileName = UNINSTALLBAT_PATH;
+                process.Start();
                 System.Windows.Application.Current.Shutdown();
             }
         }
@@ -168,13 +179,6 @@ namespace ProgTheRobotSetup
                 if (Directory.Exists(path))
                     Directory.Delete(path, true);
             }
-        }
-
-        private void Uninstall()
-        {
-            Thread.Sleep(2000);
-            Directory.Delete(INSTALL_PATH, true);
-            MessageBox.Show("The programm has been uninstalled properly");
         }
 
 
