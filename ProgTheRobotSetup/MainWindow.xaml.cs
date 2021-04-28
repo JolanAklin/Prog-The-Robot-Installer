@@ -8,6 +8,18 @@ using System.Windows;
 using Octokit;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Reflection;
+using System.Threading;
 
 namespace ProgTheRobotSetup
 {
@@ -16,9 +28,28 @@ namespace ProgTheRobotSetup
     /// </summary>
     public partial class MainWindow : Window
     {
-        string installPath = $@"C:\Program Files\ProgTheRobot";
-        string path = $@"C:\Program Files\ProgTheRobot\temp\";
-        string dlFileName = "progtherobot";
+
+        #region ButtonEvents
+
+        #endregion
+
+        // install constants
+        const string INSTALL_PATH = @"C:\Program Files\ProgTheRobot";
+        const string TEMP_PATH = @"C:\Program Files\ProgTheRobot\temp\";
+        const string DL_FILE_NAME = "progtherobot";
+        const string PROGRAMS_PATH = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
+
+        enum GridPanel
+        {
+            Main = 0,
+            InstallConf,
+            Download,
+            Finished
+        }
+
+
+        private Dictionary<GridPanel, Grid> gridShowOrder = new Dictionary<GridPanel, Grid>();
+        private GridPanel currentPanel = GridPanel.Main;
         public MainWindow()
         {
             InitializeComponent();
@@ -27,38 +58,82 @@ namespace ProgTheRobotSetup
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             DownloadGrid.Visibility = Visibility.Hidden;
+            InstallSettingsGrid.Visibility = Visibility.Hidden;
+
+            gridShowOrder.Add(GridPanel.Main, MainGrid);
+            gridShowOrder.Add(GridPanel.InstallConf, InstallSettingsGrid);
+            gridShowOrder.Add(GridPanel.Download, DownloadGrid);
         }
+
+        /// <summary>
+        /// Show the next grid
+        /// </summary>
+        private void ShowNextGrid()
+        {
+            try
+            {
+                gridShowOrder[currentPanel].Visibility = Visibility.Hidden;
+                int test = (int)currentPanel;
+                currentPanel = Enum.Parse<GridPanel>((test + 1).ToString());
+                gridShowOrder[currentPanel].Visibility = Visibility.Visible;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Show the previous grid
+        /// </summary>
+        private void ShowPreviousGrid()
+        {
+            try
+            {
+                gridShowOrder[currentPanel].Visibility = Visibility.Hidden;
+                int test = (int)currentPanel;
+                currentPanel = Enum.Parse<GridPanel>((test - 1).ToString());
+                gridShowOrder[currentPanel].Visibility = Visibility.Visible;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Remove the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Uninstall(object sender, RoutedEventArgs e)
         {
             if(MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                RemoveInstallDir(new string[] { installPath, path });
                 RemoveStartMenuEntry();
+                // do not put the default file in the locallow
                 // need to remove files in locallow and the file association
-                MessageBox.Show("The programm has been uninstalled properly");
+                Thread uninstallThread = new Thread(Uninstall);
+                uninstallThread.Start();
+                System.Windows.Application.Current.Shutdown();
             }
         }
 
         private void StartInstall(object sender, RoutedEventArgs e)
         {
-            MainGrid.Visibility = Visibility.Hidden;
-            DownloadGrid.Visibility = Visibility.Visible;
+            ShowNextGrid();
 
-
-
-            RemoveInstallDir(new string[] { installPath, path });
-            CreateInstallDir(new string[] { installPath, path });
+            RemoveDir(new string[] { INSTALL_PATH, TEMP_PATH });
+            CreateDir(new string[] { INSTALL_PATH, TEMP_PATH });
 
             GetDownloadLinks((url) =>
             { 
                 DownloadFromUrl(
                 new Uri(url),
-                System.IO.Path.Combine(path, dlFileName),
+                System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME),
                 () =>
                 {
-                    FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(path, dlFileName));
-                    UnzipFromStream(stream, installPath);
-                    CreateStartMenuEntry(System.IO.Path.Combine(installPath, "Prog the robot.exe"));
+                    FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME));
+                    UnzipFromStream(stream, INSTALL_PATH);
+                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"));
                     MessageBox.Show("Finished");
                 });
             });
@@ -77,7 +152,7 @@ namespace ProgTheRobotSetup
             DownLoadProgress.Value = e.ProgressPercentage;
         }
 
-        private void CreateInstallDir(string[] dirs)
+        private void CreateDir(string[] dirs)
         {
             foreach (string path in dirs)
             {
@@ -86,13 +161,20 @@ namespace ProgTheRobotSetup
             }
         }
 
-        private void RemoveInstallDir(string[] dirs)
+        private void RemoveDir(string[] dirs)
         {
             foreach (string path in dirs)
             {
                 if (Directory.Exists(path))
                     Directory.Delete(path, true);
             }
+        }
+
+        private void Uninstall()
+        {
+            Thread.Sleep(2000);
+            Directory.Delete(INSTALL_PATH, true);
+            MessageBox.Show("The programm has been uninstalled properly");
         }
 
 
@@ -102,9 +184,8 @@ namespace ProgTheRobotSetup
         /// <param name="targetPath">The path to the executable</param>
         private void CreateStartMenuEntry(string targetPath)
         {
-            string programs_path = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
-            string settingsLink = System.IO.Path.Combine(programs_path, "Prog The Robot.lnk");
-            IWshShortcut shortcut = (IWshShortcut)new WshShell().CreateShortcut(settingsLink);
+            string appLink = System.IO.Path.Combine(PROGRAMS_PATH, "Prog The Robot.lnk");
+            IWshShortcut shortcut = (IWshShortcut)new WshShell().CreateShortcut(appLink);
             shortcut.TargetPath = targetPath;
             shortcut.Description = "Launch Prog The Robot";
             shortcut.Save();
@@ -174,5 +255,9 @@ namespace ProgTheRobotSetup
             endCallBack?.Invoke(url);
         }
 
+        private void InstallSettingsNext(object sender, RoutedEventArgs e)
+        {
+            ShowNextGrid();
+        }
     }
 }
