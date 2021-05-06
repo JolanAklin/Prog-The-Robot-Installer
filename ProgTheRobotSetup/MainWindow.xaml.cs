@@ -32,6 +32,57 @@ namespace ProgTheRobotSetup
 
         #region ButtonEvents
 
+        private void BackButton(object sender, RoutedEventArgs e)
+        {
+            ShowPreviousGrid();
+        }
+
+        private void StartInstall(object sender, RoutedEventArgs e)
+        {
+            ShowNextGrid();
+            ShowReleaseTag();
+        }
+
+        /// <summary>
+        /// Remove the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Uninstall(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+
+                if (IsFileLocked(new FileInfo(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"))))
+                {
+                    MessageBox.Show("Please close Prog The Robot First", "Uninstall", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RemoveStartMenuEntry();
+
+                var procId = Process.GetCurrentProcess().Id;
+
+                //remove the regestry keys
+
+                StreamWriter stream = System.IO.File.CreateText(UNINSTALLBAT_PATH);
+                stream.WriteLine($"Taskkill /F /PID {procId}");
+                stream.WriteLine($"rmdir /S /Q \"{INSTALL_PATH}\"");
+                stream.WriteLine("powershell -Command \"& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Prog The Robot was successfully removed', 'Uninstaller', 'OK', [System.Windows.Forms.MessageBoxIcon]::Information);}\"");
+                stream.WriteLine($"del /Q \"{UNINSTALLBAT_PATH}\"");
+                stream.Close();
+                Process process = new Process();
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.FileName = UNINSTALLBAT_PATH;
+                process.Start();
+                System.Windows.Application.Current.Shutdown();
+            }
+
+        }
+        private void InstallSettingsNext(object sender, RoutedEventArgs e)
+        {
+            ShowNextGrid();
+            Install();
+        }
         #endregion
 
         // install constants
@@ -61,10 +112,57 @@ namespace ProgTheRobotSetup
         {
             DownloadGrid.Visibility = Visibility.Hidden;
             InstallSettingsGrid.Visibility = Visibility.Hidden;
+            FinishedGrid.Visibility = Visibility.Hidden;
 
             gridShowOrder.Add(GridPanel.Main, MainGrid);
             gridShowOrder.Add(GridPanel.InstallConf, InstallSettingsGrid);
             gridShowOrder.Add(GridPanel.Download, DownloadGrid);
+            gridShowOrder.Add(GridPanel.Finished, FinishedGrid);
+
+            VerLabel.Visibility = Visibility.Hidden;
+        }
+
+        private void Install()
+        {
+            CreateDir(new string[] { INSTALL_PATH, TEMP_PATH, PROGRAMS_PATH });
+            string path = Process.GetCurrentProcess().MainModule.FileName;
+            string fileName = System.IO.Path.GetFileName(path);
+            if (!System.IO.File.Exists(System.IO.Path.Combine(INSTALL_PATH, fileName)))
+            {
+                System.IO.File.Copy(path, System.IO.Path.Combine(INSTALL_PATH, fileName), true);
+            }
+            GetDownloadLinks((url) =>
+            {
+                DownloadFromUrl(
+                new Uri(url),
+                System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME),
+                () =>
+                {
+                    FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME));
+                    UnzipFromStream(stream, INSTALL_PATH);
+                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), "Prog The Robot.lnk", "Launch Prog The Robot");
+                    RemoveDir(new string[] { TEMP_PATH });
+                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
+
+                    FileAssociation fileAssociation = new FileAssociation("Prog The Robot");
+                    fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"));
+
+                    ShowNextGrid();
+                });
+            });
+        }
+
+        private void FileAssociation()
+        {
+
+        }
+
+        private void ShowMain()
+        {
+            gridShowOrder[currentPanel].Visibility = Visibility.Hidden;
+            int test = (int)GridPanel.Main;
+            currentPanel = Enum.Parse<GridPanel>((test).ToString());
+            gridShowOrder[currentPanel].Visibility = Visibility.Visible;
         }
 
         /// <summary>
@@ -102,39 +200,6 @@ namespace ProgTheRobotSetup
         }
 
         /// <summary>
-        /// Remove the program
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Uninstall(object sender, RoutedEventArgs e)
-        {
-            if(MessageBox.Show("Do you really want to uninstall this program ?", "Uninstall", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-
-                if(IsFileLocked(new FileInfo(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"))))
-                {
-                    MessageBox.Show("Please close Prog The Robot First", "Uninstall", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                RemoveStartMenuEntry();
-
-                var procId = Process.GetCurrentProcess().Id;
-
-                StreamWriter stream = System.IO.File.CreateText(UNINSTALLBAT_PATH);
-                stream.WriteLine($"Taskkill /F /PID {procId}");
-                stream.WriteLine($"rmdir /S /Q \"{INSTALL_PATH}\"");
-                stream.WriteLine("powershell -Command \"& {Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Prog The Robot was successfully removed', 'Uninstaller', 'OK', [System.Windows.Forms.MessageBoxIcon]::Information);}\"");
-                stream.WriteLine($"del /Q \"{UNINSTALLBAT_PATH}\"");
-                stream.Close();
-                Process process = new Process();
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.FileName = UNINSTALLBAT_PATH;
-                process.Start();
-                System.Windows.Application.Current.Shutdown();
-            }
-        }
-
-        /// <summary>
         /// <see cref="https://www.codercream.com/check-file-use-c-code/"/>
         /// </summary>
         /// <param name="file"></param>
@@ -163,35 +228,6 @@ namespace ProgTheRobotSetup
 
             //file is not locked
             return false;
-        }
-
-
-        private void StartInstall(object sender, RoutedEventArgs e)
-        {
-            ShowNextGrid();
-
-            CreateDir(new string[] { INSTALL_PATH, TEMP_PATH, PROGRAMS_PATH });
-
-            string path = Process.GetCurrentProcess().MainModule.FileName;
-            string fileName = System.IO.Path.GetFileName(path);
-            System.IO.File.Copy(path, System.IO.Path.Combine(INSTALL_PATH, fileName), true);
-
-            GetDownloadLinks((url) =>
-            { 
-                DownloadFromUrl(
-                new Uri(url),
-                System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME),
-                () =>
-                {
-                    FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME));
-                    UnzipFromStream(stream, INSTALL_PATH);
-                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), "Prog The Robot.lnk", "Launch Prog The Robot");
-                    RemoveDir(new string[] { TEMP_PATH });
-                    CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
-                    MessageBox.Show("Finished");
-                    System.Windows.Application.Current.Shutdown();
-                });
-            });
         }
 
 
@@ -295,16 +331,38 @@ namespace ProgTheRobotSetup
         /// </summary>
         private async void GetDownloadLinks(Action<string> endCallBack)
         {
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("ProgTheRobotSetup"));
-            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("jolanaklin", "progtherobot");
-            var latest = releases[0];
-            string url = Array.Find<ReleaseAsset>(latest.Assets.ToArray(), x => x.Name == "ProgTheRobot.zip").BrowserDownloadUrl;
-            endCallBack?.Invoke(url);
+            try
+            {
+                GitHubClient client = new GitHubClient(new ProductHeaderValue("ProgTheRobotSetup"));
+                IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("jolanaklin", "progtherobot");
+                var latest = releases[0];
+                string url = Array.Find<ReleaseAsset>(latest.Assets.ToArray(), x => x.Name == "ProgTheRobot.zip").BrowserDownloadUrl;
+                endCallBack?.Invoke(url);
+            }
+            catch (Exception) { MessageBox.Show("Can't connect to GitHub", "Connecting to GitHub", MessageBoxButton.OK, MessageBoxImage.Error); ShowMain(); }
         }
 
-        private void InstallSettingsNext(object sender, RoutedEventArgs e)
+        private async void ShowReleaseTag()
         {
-            ShowNextGrid();
+            try
+            {
+                GitHubClient client = new GitHubClient(new ProductHeaderValue("ProgTheRobotSetup"));
+                IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("jolanaklin", "progtherobot");
+                var latest = releases[0];
+                VerLabel.Content = latest.TagName;
+                SolidColorBrush solidColor = null;
+                if (latest.Prerelease)
+                {
+                    solidColor = new SolidColorBrush(Color.FromRgb(Convert.ToByte(255), Convert.ToByte(133), Convert.ToByte(0)));
+                }
+                else
+                {
+                    solidColor = new SolidColorBrush(Color.FromRgb(Convert.ToByte(0), Convert.ToByte(128), Convert.ToByte(0)));
+                }
+                VerLabel.Background = solidColor;
+                VerLabel.Visibility = Visibility.Visible;
+            }
+            catch (Exception) { MessageBox.Show("Can't connect to GitHub", "Connecting to GitHub", MessageBoxButton.OK, MessageBoxImage.Error); ShowMain(); }
         }
     }
 }
