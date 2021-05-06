@@ -62,7 +62,8 @@ namespace ProgTheRobotSetup
 
                 var procId = Process.GetCurrentProcess().Id;
 
-                //remove the regestry keys
+                FileAssociation fileAssociation = new FileAssociation("Prog The Robot");
+                fileAssociation.RemoveExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"));
 
                 StreamWriter stream = System.IO.File.CreateText(UNINSTALLBAT_PATH);
                 stream.WriteLine($"Taskkill /F /PID {procId}");
@@ -144,8 +145,12 @@ namespace ProgTheRobotSetup
                     RemoveDir(new string[] { TEMP_PATH });
                     CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
 
+                    Stream fileImage = System.IO.File.Create(System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
+                    fileImage.Write(Properties.Resources.FileLogo);
+                    fileImage.Close();
+
                     FileAssociation fileAssociation = new FileAssociation("Prog The Robot");
-                    fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"));
+                    fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
 
                     ShowNextGrid();
                 });

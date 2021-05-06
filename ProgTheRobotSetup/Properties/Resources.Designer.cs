@@ -63,6 +63,16 @@ namespace ProgTheRobotSetup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        public static byte[] FileLogo {
+            get {
+                object obj = ResourceManager.GetObject("FileLogo", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         public static byte[] imgrobot_side {
             get {
                 object obj = ResourceManager.GetObject("imgrobot_side", resourceCulture);

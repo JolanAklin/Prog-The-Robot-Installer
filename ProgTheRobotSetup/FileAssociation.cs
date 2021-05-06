@@ -43,7 +43,22 @@ namespace ProgTheRobotSetup
             set { applicationName = value; }
         }
 
-        public void SetExtension(string extension, string appPath)
+        public void RemoveExtension(string extension, string appPath)
+        {
+            RegistryKey root = Registry.ClassesRoot;
+
+            RegistryKey exist = root.OpenSubKey(extension);
+            if (exist != null)
+                root.DeleteSubKeyTree(extension);
+            exist = root.OpenSubKey(applicationName);
+            if (exist != null)
+                root.DeleteSubKeyTree(applicationName);
+
+            // tell the shell to remake the icon cache
+            SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        public void SetExtension(string extension, string appPath, string iconPath)
         {
             RegistryKey root = Registry.ClassesRoot;
             RegistryKey key;
@@ -65,7 +80,7 @@ namespace ProgTheRobotSetup
 
             // set the file icon
             key = programKey.CreateSubKey("DefaultIcon");
-            key.SetValue("", appPath, RegistryValueKind.String);
+            key.SetValue("", iconPath, RegistryValueKind.String);
             key.Close();
 
             //Create open command for application type (enables multiple files to use same application key)
