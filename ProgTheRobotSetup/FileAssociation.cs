@@ -43,7 +43,7 @@ namespace ProgTheRobotSetup
             set { applicationName = value; }
         }
 
-        public void RemoveExtension(string extension, string appPath)
+        public void RemoveExtension(string extension)
         {
             RegistryKey root = Registry.ClassesRoot;
 

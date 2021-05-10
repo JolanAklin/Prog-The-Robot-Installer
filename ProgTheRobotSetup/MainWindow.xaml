@@ -14,7 +14,7 @@
             <ColumnDefinition Width="409*"/>
             <ColumnDefinition Width="191*"/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible" d:IsHidden="True">
+        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -23,11 +23,11 @@
                 <RowDefinition/>
                 <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
-            <Button Style="{DynamicResource ProgTheRobotButtonTemplate}" x:Name="button" Content="Installer Prog The Robot" HorizontalAlignment="Stretch" Margin="5,5,5,5" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" Click="StartInstall"/>
+            <Button Style="{DynamicResource ProgTheRobotButtonTemplate}" x:Name="button" Content="Installer Prog The Robot" HorizontalAlignment="Stretch" Margin="5,5,5,5" VerticalAlignment="Stretch" Grid.Row="1" Grid.Column="1" Click="StartInstall" IsEnabled="False"/>
             <Button x:Name="UninstallButton" Style="{DynamicResource WarningButton}" Content="Désinstaller Prog The Robot" Margin="5,5,5,5" Grid.Row="1" Click="Uninstall"/>
             <Image x:Name="image" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/imgrobot_squared.png" Margin="10,10,10,10"/>
         </Grid>
-        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" >
+        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" d:IsHidden="True" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.3*"/>
                 <ColumnDefinition/>
@@ -35,14 +35,14 @@
             <Image x:Name="image_Copy1" Source="/imgrobot_side.png" HorizontalAlignment="Right" Stretch="UniformToFill"/>
             <StackPanel Grid.Column="1" Margin="20,20,20,19">
                 <Label Style="{DynamicResource VersionLabel}" x:Name="VerLabel" Content="V1.0a" Foreground="White" HorizontalAlignment="Left"/>
-                <Label Content="Packages :" Foreground="White" FontFamily="Liberation Sans"/>
+                <Label Content="Paquets :" Foreground="White" FontFamily="Liberation Sans"/>
                 <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageMain" Content="Prog The Robot" Foreground="White" Margin="15,0,0,0" Padding="4,-1,0,0" IsChecked="True"/>
-                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageSound" Content="Sound pack" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
-                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDemo" Content="Demo pack" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
-                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDebug" Content="Prog The Robot debug" Foreground="White" Padding="4,-1,0,0" Margin="15,0,0,0"/>
+                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageSound" Content="Paquet de sons" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
+                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDemo" Content="Paquet de démos" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
+                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDebug" Content="Prog The Robot version dev" Foreground="White" Padding="4,-1,0,0" Margin="15,0,0,0"/>
             </StackPanel>
-            <Button x:Name="NextButton" Content="Next" Grid.Column="1" HorizontalAlignment="Right" Margin="5,5,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="InstallSettingsNext"/>
-            <Button x:Name="PreviousButton" Content="Back" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="BackButton"/>
+            <Button x:Name="NextButton" Content="Suivant" Grid.Column="1" HorizontalAlignment="Right" Margin="5,5,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="InstallSettingsNext"/>
+            <Button x:Name="PreviousButton" Content="Retour" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="BackButton"/>
         </Grid>
         <Grid x:Name="DownloadGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" d:IsHidden="True" >
             <Grid.ColumnDefinitions>
@@ -51,7 +51,7 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="image_Copy" Source="/imgrobot_side.png" HorizontalAlignment="Right" Stretch="UniformToFill"/>
             <StackPanel Grid.Column="1" Margin="20,20,20,19">
-                <Label x:Name="dlLbl" Content="Downloading..." Foreground="White" FontFamily="Liberation Sans"/>
+                <Label x:Name="dlLbl" Content="Téléchargement..." Foreground="White" FontFamily="Liberation Sans"/>
                 <ProgressBar x:Name="DownLoadProgress" HorizontalAlignment="Stretch" Height="15" VerticalAlignment="Top" BorderThickness="0,0,0,0" Foreground="#FF00639C" Background="#FF1E1E1E" Grid.Column="1" Margin="10,0,10,0"/>
             </StackPanel>
         </Grid>
@@ -62,7 +62,7 @@
             </Grid.ColumnDefinitions>
             <Image x:Name="image_Copy2" Source="/imgrobot_side.png" HorizontalAlignment="Right" Stretch="UniformToFill"/>
             <StackPanel Grid.Column="1" Margin="20,20,20,19">
-                <Label Content="Finished" Foreground="White" FontFamily="Liberation Sans"/>
+                <Label Content="Le programme a été installé" Foreground="White" FontFamily="Liberation Sans"/>
             </StackPanel>
         </Grid>
     </Grid>

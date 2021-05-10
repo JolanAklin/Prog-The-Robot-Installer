@@ -69,25 +69,5 @@ namespace ProgTheRobotSetup.Properties {
                 return ((byte[])(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] imgrobot_side {
-            get {
-                object obj = ResourceManager.GetObject("imgrobot_side", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] imgrobot_squared {
-            get {
-                object obj = ResourceManager.GetObject("imgrobot_squared", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

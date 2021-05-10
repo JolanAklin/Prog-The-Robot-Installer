@@ -19,9 +19,9 @@
         <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF003859"/>
         <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FF00639C"/>
         <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF00639C"/>
-        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
-        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
-        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#00ffffff"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#00ffffff"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FFffffff"/>
 
         <Style x:Key="FocusVisual1">
             <Setter Property="Control.Template">
@@ -168,7 +168,6 @@
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
-                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
