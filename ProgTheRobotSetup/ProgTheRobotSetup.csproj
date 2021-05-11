@@ -5,11 +5,13 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources\installerlogo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="imgrobot_side.png" />
     <None Remove="imgrobot_squared.png" />
+    <None Remove="installerlogo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,7 @@
   <ItemGroup>
     <Resource Include="imgrobot_side.png" />
     <Resource Include="imgrobot_squared.png" />
+    <Resource Include="installerlogo.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProgTheRobotSetup"
         mc:Ignorable="d"
-        Title="Prog The Robot Installer" Height="495" Width="600" ResizeMode="NoResize" Loaded="Window_Loaded" Background="#FF101010" Foreground="#FF646464">
+        Title="Prog The Robot Installer" Height="495" Width="600" ResizeMode="NoResize" Loaded="Window_Loaded" Background="#FF101010" Foreground="#FF646464" Icon="/installerlogo.png">
     <Grid ScrollViewer.VerticalScrollBarVisibility="Visible">
         <Grid.RowDefinitions>
             <RowDefinition/>

@@ -90,6 +90,8 @@ namespace ProgTheRobotSetup
                 PreInstall();
             }
 
+            bool needToCreateProgTheRobotDevLink = false;
+            bool needToCreateProgTheRobotLink = false;
 
             foreach (GitHubReleaseFetcher.DownloadableFiles downloadedFile in downloadedFiles)
             {
@@ -100,6 +102,7 @@ namespace ProgTheRobotSetup
                 {
                     case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobot:
                         path = INSTALL_PATH;
+                        needToCreateProgTheRobotLink = true;
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.SoundPack:
                         path = Path.Combine(INSTALL_PATH, "sounds");
@@ -109,6 +112,7 @@ namespace ProgTheRobotSetup
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobotDev:
                         path = Path.Combine(INSTALL_PATH, "dev");
+                        needToCreateProgTheRobotDevLink = true;
                         break;
                 }
                 CreateDir(new string[] { path });
@@ -122,17 +126,35 @@ namespace ProgTheRobotSetup
             RemoveDir(new string[] { TEMP_PATH });
 
             // create start menu entry for the program and the installer
-            CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), "Prog The Robot.lnk", "Launch Prog The Robot");
-            CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
+            if(needToCreateProgTheRobotLink)
+            {
+                CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), "Prog The Robot.lnk", "Launch Prog The Robot");
+                CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, fileName), "Prog The Robot installer.lnk", "Install, update and uninstall Prog The Robot");
+            }
+
+            if(needToCreateProgTheRobotDevLink)
+                CreateStartMenuEntry(System.IO.Path.Combine(INSTALL_PATH, "dev", "Prog the robot.exe"), "Prog The Robot Dev.lnk", "Prog The Robot Dev Edition");
 
             // create the icon for the .pr files
             Stream fileImage = System.IO.File.Create(System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
             fileImage.Write(Properties.Resources.FileLogo);
             fileImage.Close();
 
-            // create the file association
-            FileAssociation fileAssociation = new FileAssociation("Prog The Robot", "Prog The Robot project");
-            fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
+            FileAssociation fileAssociation;
+            // create the file association for prog the robot dev
+            if (needToCreateProgTheRobotDevLink)
+            {
+                fileAssociation = new FileAssociation("Prog The Robot Dev", "Prog The Robot project");
+                fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "dev", "Prog the robot.exe"), System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
+            }
+
+            // create the file association for prog the robot
+            if(needToCreateProgTheRobotLink)
+            {
+                fileAssociation = new FileAssociation("Prog The Robot", "Prog The Robot project");
+                fileAssociation.SetExtension(".pr", System.IO.Path.Combine(INSTALL_PATH, "Prog the robot.exe"), System.IO.Path.Combine(INSTALL_PATH, "FileLogo.ico"));
+            }
+
             CallBack?.Invoke();
         }
 
@@ -149,6 +171,9 @@ namespace ProgTheRobotSetup
             RemoveDir(new string[] { PROGRAMS_PATH });
 
             FileAssociation fileAssociation = new FileAssociation("Prog The Robot");
+            fileAssociation.RemoveExtension(".pr");
+
+            fileAssociation = new FileAssociation("Prog The Robot Dev");
             fileAssociation.RemoveExtension(".pr");
 
             // create a batch to remove everything
