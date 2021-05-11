@@ -109,6 +109,11 @@ namespace ProgTheRobotSetup
             gridShowOrder.Add(GridPanel.Download, DownloadGrid);
             gridShowOrder.Add(GridPanel.Finished, FinishedGrid);
 
+            if(System.IO.Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) != INSTALL_PATH)
+            {
+                UninstallButton.IsEnabled = false;
+            }
+
             if(GitHubReleaseFetcher.CreateGitHubClient() == null)
             {
                 MessageBox.Show("Impossible de se connecter à GitHub" + Environment.NewLine + "Verifier que votre PC est connecté à Internet", "Connecting to GitHub", MessageBoxButton.OK, MessageBoxImage.Error); ShowMain();

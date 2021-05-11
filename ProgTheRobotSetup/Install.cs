@@ -168,7 +168,7 @@ namespace ProgTheRobotSetup
                 return "Please close Prog The Robot First";
             }
 
-            RemoveDir(new string[] { PROGRAMS_PATH });
+            RemoveDir(new string[] { PROGRAMS_PATH, $@"C:/Users/{Environment.UserName}/AppData/LocalLow/Jolan Aklin/Prog the robot" });
 
             FileAssociation fileAssociation = new FileAssociation("Prog The Robot");
             fileAssociation.RemoveExtension(".pr");
@@ -201,7 +201,7 @@ namespace ProgTheRobotSetup
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        protected virtual bool IsFileLocked(FileInfo file)
+        private static bool IsFileLocked(FileInfo file)
         {
             FileStream stream = null;
 

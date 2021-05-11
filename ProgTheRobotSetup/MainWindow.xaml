@@ -14,7 +14,7 @@
             <ColumnDefinition Width="409*"/>
             <ColumnDefinition Width="191*"/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible" d:IsHidden="True">
+        <Grid x:Name="MainGrid" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -27,7 +27,7 @@
             <Button x:Name="UninstallButton" Style="{DynamicResource WarningButton}" Content="Désinstaller Prog The Robot" Margin="5,5,5,5" Grid.Row="1" Click="Uninstall"/>
             <Image x:Name="image" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/imgrobot_squared.png" Margin="10,10,10,10"/>
         </Grid>
-        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" >
+        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" d:IsHidden="True" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.3*"/>
                 <ColumnDefinition/>
