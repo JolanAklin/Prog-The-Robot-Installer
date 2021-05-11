@@ -61,8 +61,17 @@ namespace ProgTheRobotSetup
 
         private void InstallSettingsNext(object sender, RoutedEventArgs e)
         {
+            List<GitHubReleaseFetcher.DownloadableFiles> downloadableFiles = new List<GitHubReleaseFetcher.DownloadableFiles>();
+            if (packageMain.IsChecked == true)
+                downloadableFiles.Add(GitHubReleaseFetcher.DownloadableFiles.ProgTheRobot);
+            if (packageSound.IsChecked == true)
+                downloadableFiles.Add(GitHubReleaseFetcher.DownloadableFiles.SoundPack);
+            if (packageDemo.IsChecked == true)
+                downloadableFiles.Add(GitHubReleaseFetcher.DownloadableFiles.DemoPack);
+            if (packageDebug.IsChecked == true)
+                downloadableFiles.Add(GitHubReleaseFetcher.DownloadableFiles.ProgTheRobotDev);
             ShowNextGrid();
-            StartInstall();
+            StartInstall(downloadableFiles.ToArray());
         }
         #endregion
 
@@ -111,19 +120,23 @@ namespace ProgTheRobotSetup
 
         }
 
-        private void StartInstall()
+        private async void StartInstall(GitHubReleaseFetcher.DownloadableFiles[] downloadableFiles)
         {
             Install install = new Install(PROGRAMS_PATH, INSTALL_PATH, TEMP_PATH, DL_FILE_NAME, UNINSTALLBAT_PATH);
             install.PreInstall();
 
-            string url = GitHubReleaseFetcher.GetReleaseAssetUrl(GitHubReleaseFetcher.DownloadableFiles.ProgTheRobot);
 
-            DownloadFile dlFile = new DownloadFile();
-            dlFile.onProgressChanged += (object sender, DownloadProgressChangedEventArgs e) => { DownLoadProgress.Value = e.ProgressPercentage; };
-            dlFile.DownloadFromUrl(new Uri(url), System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME),
-            () => {
-                install.InstallApp(() => { ShowNextGrid(); });
-            });
+            foreach (GitHubReleaseFetcher.DownloadableFiles downloadable in downloadableFiles)
+            {
+                dlLbl.Content = "Téléchargement de " + downloadable;
+                string url = GitHubReleaseFetcher.GetReleaseAssetUrl(downloadable);
+                DownloadFile dlFile = new DownloadFile();
+                dlFile.onProgressChanged += (object sender, DownloadProgressChangedEventArgs e) => { DownLoadProgress.Value = e.ProgressPercentage; };
+                // need to change the DL_FILE_NAME
+                Task t = dlFile.DownloadFromUrl(new Uri(url), System.IO.Path.Combine(TEMP_PATH, downloadable.ToString()), null);
+                await t;
+            }
+            install.InstallApp(downloadableFiles, () => { ShowNextGrid(); });
         }
 
         /// <summary>
@@ -186,6 +199,7 @@ namespace ProgTheRobotSetup
                 solidColor = new SolidColorBrush(Color.FromRgb(Convert.ToByte(0), Convert.ToByte(128), Convert.ToByte(0)));
             }
             VerLabel.Background = solidColor;
+            VerLabel.Content = GitHubReleaseFetcher.LatestRelease.TagName;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace ProgTheRobotSetup
         /// <param name="ressource">Where the file is stored</param>
         /// <param name="savePath">The path where the file will be saved to</param>
         /// <param name="endCallback">Called when the download is finished</param>
-        public async void DownloadFromUrl(Uri ressource, string savePath, Action endCallback)
+        public async Task DownloadFromUrl(Uri ressource, string savePath, Action endCallback)
         {
             WebClient webClient = new WebClient();
             webClient.DownloadProgressChanged += ProgressChanged;

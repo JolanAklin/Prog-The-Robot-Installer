@@ -83,18 +83,41 @@ namespace ProgTheRobotSetup
         /// install the program, add start menu entry and add the file association
         /// </summary>
         /// <param name="CallBack">Called when the installation is finished</param>
-        public async void InstallApp(Action CallBack)
+        public async void InstallApp(GitHubReleaseFetcher.DownloadableFiles[] downloadedFiles, Action CallBack)
         {
             if(fileName == null)
             {
                 PreInstall();
             }
 
-            //unzip the downloaded Prog the robot release
-            FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, DL_FILE_NAME));
-            Task t = new Task(() => { UnzipFromStream(stream, INSTALL_PATH); });
-            t.Start();
-            await t;
+
+            foreach (GitHubReleaseFetcher.DownloadableFiles downloadedFile in downloadedFiles)
+            {
+                //unzip the downloaded Prog the robot release
+                FileStream stream = System.IO.File.OpenRead(System.IO.Path.Combine(TEMP_PATH, downloadedFile.ToString()));
+                string path = "";
+                switch (downloadedFile)
+                {
+                    case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobot:
+                        path = INSTALL_PATH;
+                        break;
+                    case GitHubReleaseFetcher.DownloadableFiles.SoundPack:
+                        path = Path.Combine(INSTALL_PATH, "sounds");
+                        break;
+                    case GitHubReleaseFetcher.DownloadableFiles.DemoPack:
+                        path = $@"C:/Users/{Environment.UserName}/AppData/LocalLow/Jolan Aklin/Prog the robot/saves/";
+                        break;
+                    case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobotDev:
+                        path = Path.Combine(INSTALL_PATH, "dev");
+                        break;
+                }
+                CreateDir(new string[] { path });
+                Task t = new Task(() => { UnzipFromStream(stream, path); });
+                t.Start();
+                await t;
+            }
+
+            //unzip all the other files
 
             RemoveDir(new string[] { TEMP_PATH });
 
