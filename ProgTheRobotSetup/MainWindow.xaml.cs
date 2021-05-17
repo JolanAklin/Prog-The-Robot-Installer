@@ -32,6 +32,11 @@ namespace ProgTheRobotSetup
 
         #region ButtonEvents
 
+        private void ButtonNext(object sender, RoutedEventArgs e)
+        {
+            ShowNextGrid();
+        }
+
         private void BackButton(object sender, RoutedEventArgs e)
         {
             ShowPreviousGrid();
@@ -85,6 +90,7 @@ namespace ProgTheRobotSetup
         enum GridPanel
         {
             Main = 0,
+            copying,
             InstallConf,
             Download,
             Finished
@@ -100,11 +106,13 @@ namespace ProgTheRobotSetup
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            COPYING.Visibility = Visibility.Hidden;
             DownloadGrid.Visibility = Visibility.Hidden;
             InstallSettingsGrid.Visibility = Visibility.Hidden;
             FinishedGrid.Visibility = Visibility.Hidden;
 
             gridShowOrder.Add(GridPanel.Main, MainGrid);
+            gridShowOrder.Add(GridPanel.copying, COPYING);
             gridShowOrder.Add(GridPanel.InstallConf, InstallSettingsGrid);
             gridShowOrder.Add(GridPanel.Download, DownloadGrid);
             gridShowOrder.Add(GridPanel.Finished, FinishedGrid);

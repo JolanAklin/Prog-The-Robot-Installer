@@ -105,10 +105,11 @@ namespace ProgTheRobotSetup
                         needToCreateProgTheRobotLink = true;
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.SoundPack:
-                        path = Path.Combine(INSTALL_PATH, "sounds");
+                        path = Path.Combine(INSTALL_PATH, "Prog the robot_Data", "sounds");
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.DemoPack:
-                        path = $@"C:/Users/{Environment.UserName}/AppData/LocalLow/Jolan Aklin/Prog the robot/saves/";
+                        path = Path.Combine(INSTALL_PATH, "Prog the robot_Data", "default");
+
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobotDev:
                         path = Path.Combine(INSTALL_PATH, "dev");
