@@ -93,6 +93,9 @@ namespace ProgTheRobotSetup
             bool needToCreateProgTheRobotDevLink = false;
             bool needToCreateProgTheRobotLink = false;
 
+            bool devInstall = false;
+            bool soundInstall = false;
+
             foreach (GitHubReleaseFetcher.DownloadableFiles downloadedFile in downloadedFiles)
             {
                 //unzip the downloaded Prog the robot release
@@ -106,12 +109,14 @@ namespace ProgTheRobotSetup
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.SoundPack:
                         path = Path.Combine(INSTALL_PATH, "Prog the robot_Data", "sounds");
+                        soundInstall = true;
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.DemoPack:
                         path = $@"C:/Users/{Environment.UserName}/AppData/LocalLow/Jolan Aklin/Prog the robot/saves/";
                         break;
                     case GitHubReleaseFetcher.DownloadableFiles.ProgTheRobotDev:
                         path = Path.Combine(INSTALL_PATH, "dev");
+                        devInstall = true;
                         needToCreateProgTheRobotDevLink = true;
                         break;
                 }
@@ -121,7 +126,16 @@ namespace ProgTheRobotSetup
                 await t;
             }
 
-            //unzip all the other files
+            if(devInstall && soundInstall)
+            {
+                string devSound = Path.Combine(INSTALL_PATH, "dev", "Prog the robot_Data", "sounds");
+                CreateDir(new string[] { devSound});
+                DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(INSTALL_PATH, "Prog the robot_Data", "sounds"));
+                foreach (FileInfo file in directoryInfo.GetFiles())
+                {
+                    file.CopyTo(Path.Combine(devSound, file.Name));
+                }
+            }    
 
             RemoveDir(new string[] { TEMP_PATH });
 
