@@ -27,7 +27,7 @@
             <Button x:Name="UninstallButton" Style="{DynamicResource WarningButton}" Content="Désinstaller Prog The Robot" Margin="5,5,5,5" Grid.Row="1" Click="Uninstall"/>
             <Image x:Name="image" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="/imgrobot_squared.png" Margin="10,10,10,10"/>
         </Grid>
-        <Grid x:Name="COPYING" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" >
+        <Grid x:Name="COPYING" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" d:IsHidden="True" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.3*"/>
                 <ColumnDefinition/>
@@ -39,7 +39,7 @@
             <Button x:Name="NextButton_Copy" Content="Accepter et continuer" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="ButtonNext"/>
             <Button x:Name="PreviousButton_Copy" Content="Retour" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,0,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="BackButton"/>
         </Grid>
-        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" d:IsHidden="True" >
+        <Grid x:Name="InstallSettingsGrid" Panel.ZIndex="1" Visibility="Visible" Grid.ColumnSpan="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.3*"/>
                 <ColumnDefinition/>
@@ -51,7 +51,7 @@
                 <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageMain" Content="Prog The Robot" Foreground="White" Margin="15,0,0,0" Padding="4,-1,0,0" IsChecked="True"/>
                 <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageSound" Content="Paquet de sons" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
                 <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDemo" Content="Paquet de démos" Foreground="White" Padding="4,-1,0,0" IsChecked="True" Margin="15,0,0,0"/>
-                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDebug" Content="Prog The Robot version dev" Foreground="White" Padding="4,-1,0,0" Margin="15,0,0,0"/>
+                <CheckBox Style="{DynamicResource Checkbx}" x:Name="packageDebug" Content="Prog The Robot version dev" Foreground="White" Padding="4,-1,0,0" Margin="15,0,0,0" Visibility="Collapsed"/>
             </StackPanel>
             <Button x:Name="NextButton" Content="Suivant" Grid.Column="1" HorizontalAlignment="Right" Margin="5,5,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="InstallSettingsNext"/>
             <Button x:Name="PreviousButton" Content="Retour" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,5,5" VerticalAlignment="Bottom" Style="{DynamicResource ProgTheRobotButtonTemplate}" Panel.ZIndex="1" Click="BackButton"/>
